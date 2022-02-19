@@ -25,18 +25,23 @@
 
 \maketitle
 
-\section{Introduction}
-To solve this problem, we employed an evolutionary algorithm. 
-\cite{Tesla}
+\section{Approach}
+To solve this problem, we employed an evolutionary algorithm.  \cite{Tesla}
 
 An evolutionary algorithm typically uses the following structure: Individuals are initialised and a loop of selection, crossover, mutation and replacement operations occur until a stopping criteria is met. In the paper, we document experiments on the selection, crossover, mutation and replacement operations with the intent of finding the combination of operators that lead to the best fitness value.
 
 EV CHOSEN
 
 NEURAL NETWORK PARAMETERS
-\section{Methodology}
-\section{Results}
-\section{Conclusion}
+\section{Experiments \& Analysis}
+\subsection{Selection}
+Selection is the process by which the algorithm chooses which individuals will reproduce. A good selection operator will allow the population to trend towards higher fitness without causing a premature convergence. The following selection methods were implemented and tested:
+\begin{description}
+\item[Fitness Proportionate Roulette Selection] selects individuals in proportion to their fitness. If an individual has higher fitness, it is more likely to be selected. The formula in  is followed to compute the probability of an individual being chosen, where the dividend is the fitness of the individual and the divisor is the sum of the fitness of all individuals in the population.
+\item[Tournament Selection] selects t individuals from the population and selects the fittest individual. We explore the effect on average fitness by changing t.
+\end{description}
+\section{Conclusions}
+\section{Future Work}
 
 
 \bibliographystyle{ACM-Reference-Format}

@@ -2,9 +2,10 @@ package coursework;
 
 import java.lang.reflect.Field;
 import java.util.Random;
+
 import model.LunarParameters;
-import model.NeuralNetwork;
 import model.LunarParameters.DataSet;
+import model.NeuralNetwork;
 
 public class Parameters {
  
@@ -13,28 +14,28 @@ public class Parameters {
 	 * You may add other Parameters as required to this class 
 	 * 
 	 */
-	private static int numHidden = 5;	
+	private static int numHidden = 12;	
 	private static int numGenes = calculateNumGenes();
 	public static double minGene = -3; // specifies minimum and maximum weight values 
 	public static double maxGene = +3;
 		
-	public static int popSize = 40;
-	public static int maxEvaluations = 5000;
+	public static int popSize = 200;
+	public static int maxEvaluations = 20000;
 	
-	public static int tournamentSize = 4;
+	public static int tournamentSize = 50;
 	
 	// Parameters for mutation 
 	// Rate = probability of changing a gene
 	// Change = the maximum +/- adjustment to the gene value
-	public static double mutateRate = 0.04; // mutation rate for mutation operator
-	public static double mutateChange = 0.1; // delta change for mutation operator
+	public static double mutateRate = 0.5; // mutation rate for mutation operator
+	public static double mutateChange = 1.0; // delta change for mutation operator
 	
 	//Random number generator used throughout the application
 	public static long seed = System.currentTimeMillis();
 	public static Random random = new Random(seed);
 
 	//set the NeuralNetwork class here to use your code from the GUI
-	public static Class neuralNetworkClass = ExampleEvolutionaryAlgorithm.class;
+	public static Class neuralNetworkClass = EvolutionaryAlgorithm.class;
 	
 	/**
 	 * Do not change any methods that appear below here.

@@ -30,7 +30,7 @@ public class StartNoGui {
 		
 		
 		//Create a new Neural Network Trainer Using the above parameters 
-		NeuralNetwork nn = new ExampleEvolutionaryAlgorithm();		
+		NeuralNetwork nn = new EvolutionaryAlgorithm();		
 		
 		//train the neural net (Go and have a coffee) 
 		nn.run();
@@ -64,7 +64,7 @@ public class StartNoGui {
 		 *  
 		 */
 		
-		ExampleEvolutionaryAlgorithm nn2 = ExampleEvolutionaryAlgorithm.loadNeuralNetwork("1518446327913-5.txt");
+		ExampleEvolutionaryAlgorithm nn2 = ExampleEvolutionaryAlgorithm.loadNeuralNetwork(null);
 		Parameters.setDataSet(DataSet.Random);
 		double fitness2 = Fitness.evaluate(nn2);
 		System.out.println("Fitness on " + Parameters.getDataSet() + " " + fitness2);

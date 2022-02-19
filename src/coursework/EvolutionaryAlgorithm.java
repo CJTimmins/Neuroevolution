@@ -7,13 +7,8 @@ import model.Individual;
 import model.LunarParameters.DataSet;
 import model.NeuralNetwork;
 
-/**
- * Implements a basic Evolutionary Algorithm to train a Neural Network
- * 
- * You Can Use This Class to implement your EA or implement your own class that extends {@link NeuralNetwork} 
- * 
- */
-public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
+
+public class EvolutionaryAlgorithm extends NeuralNetwork {
 	
 
 	/**
@@ -46,7 +41,7 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 			Individual parent2 = tournamentSelection();
 
 			// Generate a child by crossover. Not Implemented			
-			ArrayList<Individual> children = reproduce(parent1, parent2);			
+			ArrayList<Individual> children = twoPointCrossover(parent1, parent2);			
 			
 			//mutate the offspring
 			mutate(children);
@@ -120,8 +115,57 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 	 * Tournament Selection
 	 */
 	private Individual tournamentSelection() {
-		Individual parent = population.get(Parameters.random.nextInt(Parameters.popSize));
-		return parent.copy();
+		
+		
+		ArrayList<Individual> participants = new ArrayList<Individual>();
+		
+		
+		int k  = Parameters.tournamentSize;
+		
+		for (int i=0;i<k;i++)
+		{
+			participants.add(population.get(Parameters.random.nextInt(Parameters.popSize)));
+		}
+		Individual winner = new Individual();
+		for	(Individual ind: participants)
+		{
+			if (winner==null)
+			{
+				winner = ind.copy();
+			}
+			else if(ind.fitness<winner.fitness)
+			{
+				winner = ind.copy();
+			}
+		}
+		
+		return winner;
+		
+	}
+	
+	private Individual rouletteSelection()
+	{
+		double sumFitness=0;
+		double rouletteFitness=0;
+		
+		for	(int i =0; i< Parameters.popSize;i++)
+		{
+			sumFitness+=population.get(i).fitness;
+		}
+		
+		double roulettePos = Parameters.random.nextDouble() * sumFitness;
+		
+		for	(int i=0; i< Parameters.popSize; i++)
+		{
+			rouletteFitness += population.get(i).fitness;
+			if (rouletteFitness >=roulettePos)
+			{
+				return population.get(i);
+			}
+			
+		}
+		System.out.print("error in rouletteSelection");
+		return null;
 	}
 
 	/**
@@ -136,6 +180,34 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 		children.add(parent2.copy());			
 		return children;
 	} 
+	
+	private ArrayList<Individual> twoPointCrossover(Individual parent1, Individual parent2)
+	{
+		ArrayList<Individual> children = new ArrayList<>();
+		Individual child1 = new Individual();
+		Individual child2 = new Individual();
+		
+		int length = parent1.chromosome.length;
+		
+		int point1 = Parameters.random.nextInt(length);
+		int point2 = Parameters.random.nextInt(length-point1)+point1;
+		
+		for( int i=0; i<length; i++)
+		{
+			if (i <point1 || i>=point2)
+			{
+				child1.chromosome[i] = parent1.chromosome[i];
+				child2.chromosome[i] = parent2.chromosome[i];
+			}
+			else {
+				child1.chromosome[i] = parent2.chromosome[i];
+				child2.chromosome[i] = parent1.chromosome[i];
+			}
+		}
+		children.add(child1);
+		children.add(child2);
+		return children;
+	}
 	
 	/**
 	 * Mutation

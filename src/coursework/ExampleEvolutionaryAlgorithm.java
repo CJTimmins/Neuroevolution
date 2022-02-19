@@ -42,8 +42,8 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 			 */
 
 			// Select 2 Individuals from the current population. Currently returns random Individual
-			Individual parent1 = select(); 
-			Individual parent2 = select();
+			Individual parent1 = tournamentSelection(); 
+			Individual parent2 = tournamentSelection();
 
 			// Generate a child by crossover. Not Implemented			
 			ArrayList<Individual> children = reproduce(parent1, parent2);			
@@ -117,12 +117,35 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 	/**
 	 * Selection --
 	 * 
-	 * NEEDS REPLACED with proper selection this just returns a copy of a random
-	 * member of the population
+	 * Tournament Selection
 	 */
-	private Individual select() {		
-		Individual parent = population.get(Parameters.random.nextInt(Parameters.popSize));
-		return parent.copy();
+	private Individual tournamentSelection() {
+		
+		
+		ArrayList<Individual> participants = new ArrayList<Individual>();
+		
+		
+		int k  = Parameters.tournamentSize;
+		
+		for (int i=0;i<k;i++)
+		{
+			participants.add(population.get(Parameters.random.nextInt(Parameters.popSize)));
+		}
+		Individual winner = new Individual();
+		for	(Individual ind: participants)
+		{
+			if (winner==null)
+			{
+				winner = ind.copy();
+			}
+			else if(ind.fitness<winner.fitness)
+			{
+				winner = ind.copy();
+			}
+		}
+		
+		return winner;
+		
 	}
 
 	/**

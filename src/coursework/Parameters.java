@@ -19,7 +19,9 @@ public class Parameters {
 	public static double maxGene = +3;
 		
 	public static int popSize = 40;
-	public static int maxEvaluations = 20000;
+	public static int maxEvaluations = 5000;
+	
+	public static int tournamentSize = 4;
 	
 	// Parameters for mutation 
 	// Rate = probability of changing a gene
@@ -32,7 +34,7 @@ public class Parameters {
 	public static Random random = new Random(seed);
 
 	//set the NeuralNetwork class here to use your code from the GUI
-	public static Class neuralNetworkClass = ExampleHillClimber.class;
+	public static Class neuralNetworkClass = ExampleEvolutionaryAlgorithm.class;
 	
 	/**
 	 * Do not change any methods that appear below here.

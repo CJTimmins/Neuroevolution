@@ -4,6 +4,6 @@
 	<classpathentry excluding="EaNn/EvolutionaryTrainerOld.java" kind="src" path="src"/>
 	<classpathentry kind="lib" path="lib/jcommon-1.0.23.jar"/>
 	<classpathentry kind="lib" path="lib/jfreechart-1.0.19.jar"/>
-	<classpathentry kind="lib" path="lib/LunarCW2020.jar"/>
+	<classpathentry kind="lib" path="lib/LunarCW2020.jar" sourcepath="lib/LunarCW2020.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

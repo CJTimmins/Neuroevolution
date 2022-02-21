@@ -1,6 +1,7 @@
 package coursework;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import model.Fitness;
 import model.Individual;
@@ -37,20 +38,24 @@ public class EvolutionaryAlgorithm extends NeuralNetwork {
 			 */
 
 			// Select 2 Individuals from the current population. Currently returns random Individual
-			Individual parent1 = tournamentSelection(); 
-			Individual parent2 = tournamentSelection();
+			//Individual parent1 = tournamentSelection(); 
+			//Individual parent2 = tournamentSelection();
+			
+			Collections.sort(population);
+			Individual parent1 = population.get(0);
+			Individual parent2 = population.get(1);
 
 			// Generate a child by crossover. Not Implemented			
 			ArrayList<Individual> children = twoPointCrossover(parent1, parent2);			
 			
 			//mutate the offspring
-			mutate(children);
+			standardMutate(children);
 			
 			// Evaluate the children
 			evaluateIndividuals(children);			
 
 			// Replace children in population
-			replace(children);
+			tournamentReplacement(children);
 
 			// check to see if the best has improved
 			best = getBest();
@@ -127,13 +132,10 @@ public class EvolutionaryAlgorithm extends NeuralNetwork {
 			participants.add(population.get(Parameters.random.nextInt(Parameters.popSize)));
 		}
 		Individual winner = new Individual();
+		winner.fitness=Double.MAX_VALUE;
 		for	(Individual ind: participants)
 		{
-			if (winner==null)
-			{
-				winner = ind.copy();
-			}
-			else if(ind.fitness<winner.fitness)
+			if(ind.fitness<winner.fitness)
 			{
 				winner = ind.copy();
 			}
@@ -181,6 +183,31 @@ public class EvolutionaryAlgorithm extends NeuralNetwork {
 		return children;
 	} 
 	
+	private ArrayList<Individual> onePointCrossover(Individual parent1, Individual parent2)
+	{
+		ArrayList<Individual> children = new ArrayList<>();
+		Individual child1 = new Individual();
+		Individual child2 = new Individual();
+		int length = parent1.chromosome.length;
+		int point = Parameters.random.nextInt(parent1.chromosome.length);
+		
+		for( int i=0; i<length; i++)
+		{
+			if (i <point)
+			{
+				child1.chromosome[i] = parent1.chromosome[i];
+				child2.chromosome[i] = parent2.chromosome[i];
+			}
+			else {
+				child1.chromosome[i] = parent2.chromosome[i];
+				child2.chromosome[i] = parent1.chromosome[i];
+			}
+		}	
+		children.add(child1);
+		children.add(child2);		
+		return children;
+	}
+	
 	private ArrayList<Individual> twoPointCrossover(Individual parent1, Individual parent2)
 	{
 		ArrayList<Individual> children = new ArrayList<>();
@@ -209,12 +236,39 @@ public class EvolutionaryAlgorithm extends NeuralNetwork {
 		return children;
 	}
 	
+	private ArrayList<Individual> uniformCrossover(Individual parent1, Individual parent2)
+	{
+		ArrayList<Individual> children = new ArrayList<>();
+		Individual child1 = new Individual();
+		Individual child2 = new Individual();
+		
+		int length = parent1.chromosome.length;
+		
+		for( int i=0; i<length;i++)
+		{
+			if (Parameters.random.nextBoolean())
+			{
+				child1.chromosome[i] = parent1.chromosome[i];
+				child2.chromosome[i] = parent2.chromosome[i];
+			}
+			{
+				child1.chromosome[i] = parent2.chromosome[i];
+				child2.chromosome[i] = parent1.chromosome[i];
+			}
+
+		}
+		
+		children.add(child1);
+		children.add(child2);
+		return children;
+	}
+	
 	/**
 	 * Mutation
 	 * 
 	 * 
 	 */
-	private void mutate(ArrayList<Individual> individuals) {		
+	private void standardMutate(ArrayList<Individual> individuals) {		
 		for(Individual individual : individuals) {
 			for (int i = 0; i < individual.chromosome.length; i++) {
 				if (Parameters.random.nextDouble() < Parameters.mutateRate) {
@@ -227,6 +281,56 @@ public class EvolutionaryAlgorithm extends NeuralNetwork {
 			}
 		}		
 	}
+	
+	private void swapMutate(ArrayList<Individual> individuals)
+	{
+		int length = individuals.get(0).chromosome.length;
+		for(Individual ind: individuals)
+		{
+			if (Parameters.random.nextDouble() < Parameters.mutateRate)
+			{
+				int point1 = Parameters.random.nextInt(length);
+				int point2 = Parameters.random.nextInt(length);
+				double temp = ind.chromosome[point1];
+				ind.chromosome[point1]=ind.chromosome[point2];
+				ind.chromosome[point2]=temp;
+			}
+		}
+	}
+	
+	private void inverseMutate(ArrayList<Individual> individuals)
+	{
+		int length = individuals.get(0).chromosome.length;
+		for(Individual ind: individuals)
+		{
+			if (Parameters.random.nextDouble() < Parameters.mutateRate)
+			{
+				int point1 = Parameters.random.nextInt(length);
+				int point2 = Parameters.random.nextInt(length-point1)+point1;
+				
+				double[] temp = new double[point2-point1+1];
+				int count=0;
+				for	(int i=point1;i<=point2;i++)
+				{
+					temp[count] = ind.chromosome[i];
+					count++;
+				}
+				double[] reverseTemp = new double[point2-point1+1];
+				count = point2-point1;
+				for	(int i=0;i<count;i++)
+				{
+					reverseTemp[count]=temp[i];
+					--count;
+				}
+				count=0;
+				for( int i = point1; i<point2; i++)
+				{
+					ind.chromosome[i] = reverseTemp[count];
+					count++;
+				}
+			}
+		}
+	}
 
 	/**
 	 * 
@@ -234,12 +338,95 @@ public class EvolutionaryAlgorithm extends NeuralNetwork {
 	 * (regardless of fitness)
 	 * 
 	 */
-	private void replace(ArrayList<Individual> individuals) {
+	private void replaceWorst(ArrayList<Individual> individuals) {
 		for(Individual individual : individuals) {
 			int idx = getWorstIndex();		
 			population.set(idx, individual);
 		}		
 	}
+	
+	private void tournamentReplacement(ArrayList<Individual> individuals)
+	{
+		for(Individual ind: individuals)
+		{
+			ArrayList<Individual> participants = new ArrayList<Individual>();
+			
+			int k  = Parameters.tournamentSize;
+			
+			for (int i=0;i<k;i++)
+			{
+				participants.add(population.get(Parameters.random.nextInt(Parameters.popSize)));
+			}
+			Individual winner = new Individual();
+			winner.fitness=0;
+			for	(Individual i: participants)
+			{
+				if (winner==null)
+				{
+					winner = i.copy();
+				}
+				else if(i.fitness>winner.fitness)
+				{
+					winner = i.copy();
+				}
+			}
+			for (int i = 0; i < population.size(); i++) {
+				Individual index = population.get(i);
+				if (index.compareTo(winner)==0)
+				{
+					if(ind.fitness<winner.fitness)
+					{
+						population.set(i, ind);
+					}
+				}
+			
+			}
+		}
+
+	}
+	
+	
+	private void replaceWorstParent(ArrayList<Individual> individuals, Individual parent1, Individual parent2)
+	{
+		boolean p1Exists=true;
+		boolean p2Exists =true;
+		int p1Index=0;
+		int p2Index=0;
+		//find index
+		for (int i = 0; i < population.size(); i++) {
+			Individual individual = population.get(i);
+			if (individual.compareTo(parent1)==0)
+			{
+				p1Index=i;
+				break;
+			}
+		}
+		for (int i = 0; i < population.size(); i++) {
+			Individual individual = population.get(i);
+			if (individual.compareTo(parent2)==0)
+			{
+				p2Index=i;
+				break;
+			}
+		}
+		for(Individual ind: individuals)
+		{
+
+			
+			if (ind.fitness<parent1.fitness && p1Exists)
+			{
+				population.set(p1Index, ind);
+				p1Exists=false;
+			}
+			else if (ind.fitness<parent2.fitness && p2Exists)
+			{
+				population.set(p2Index, ind);
+				p2Exists=false;
+			}
+		}
+	}
+	
+
 
 	
 
@@ -263,13 +450,39 @@ public class EvolutionaryAlgorithm extends NeuralNetwork {
 		return idx;
 	}	
 
-	@Override
-	public double activationFunction(double x) {
-		if (x < -20.0) {
+	//Hyperbolic Tangent
+	
+	@Override	
+	public double activationFunction(double x) 
+	{ 
+		if (x < -20.0)
+		{ 
 			return -1.0;
-		} else if (x > 20.0) {
+		}
+		else if (x > 20.0) 
+		{
 			return 1.0;
 		}
-		return Math.tanh(x);
+		return Math.tanh(x); 
 	}
+
+	
+	//Inverse Tangent
+//	@Override
+//	public double activationFunction(double x) {
+//		if (x < -20.0) {
+//			return -1.0;
+//		} else if (x > 20.0) {
+//			return 1.0;
+//		}
+//		return Math.atan(x);
+//	}
+//	
+	
+	//Softsign
+//	@Override
+//	public double activationFunction(double x) {
+//		double result = x / (1+ Math.abs(x));
+//		return result;
+//	}
 }

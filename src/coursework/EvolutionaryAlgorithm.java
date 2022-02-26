@@ -38,12 +38,12 @@ public class EvolutionaryAlgorithm extends NeuralNetwork {
 			 */
 
 			// Select 2 Individuals from the current population. Currently returns random Individual
-			//Individual parent1 = tournamentSelection(); 
-			//Individual parent2 = tournamentSelection();
+			Individual parent1 = tournamentSelection(); 
+			Individual parent2 = tournamentSelection();
 			
-			Collections.sort(population);
-			Individual parent1 = population.get(0);
-			Individual parent2 = population.get(1);
+//			Collections.sort(population);
+//			Individual parent1 = population.get(0);
+//			Individual parent2 = population.get(1);
 
 			// Generate a child by crossover. Not Implemented			
 			ArrayList<Individual> children = twoPointCrossover(parent1, parent2);			
@@ -55,7 +55,7 @@ public class EvolutionaryAlgorithm extends NeuralNetwork {
 			evaluateIndividuals(children);			
 
 			// Replace children in population
-			tournamentReplacement(children);
+			replaceWorstParent(children,parent1,parent2);
 
 			// check to see if the best has improved
 			best = getBest();
@@ -452,19 +452,19 @@ public class EvolutionaryAlgorithm extends NeuralNetwork {
 
 	//Hyperbolic Tangent
 	
-	@Override	
-	public double activationFunction(double x) 
-	{ 
-		if (x < -20.0)
-		{ 
-			return -1.0;
-		}
-		else if (x > 20.0) 
-		{
-			return 1.0;
-		}
-		return Math.tanh(x); 
-	}
+	//@Override	
+//	public double activationFunction(double x) 
+//	{ 
+//		if (x < -20.0)
+//		{ 
+//			return -1.0;
+//		}
+//		else if (x > 20.0) 
+//		{
+//			return 1.0;
+//		}
+//		return Math.tanh(x); 
+//	}
 
 	
 	//Inverse Tangent
@@ -477,12 +477,12 @@ public class EvolutionaryAlgorithm extends NeuralNetwork {
 //		}
 //		return Math.atan(x);
 //	}
-//	
+	
 	
 	//Softsign
-//	@Override
-//	public double activationFunction(double x) {
-//		double result = x / (1+ Math.abs(x));
-//		return result;
-//	}
+	@Override
+	public double activationFunction(double x) {
+		double result = x / (1+ Math.abs(x));
+		return result;
+	}
 }

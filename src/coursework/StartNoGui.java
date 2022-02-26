@@ -1,5 +1,13 @@
 package coursework;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
+
 import model.Fitness;
 import model.LunarParameters.DataSet;
 import model.NeuralNetwork;
@@ -19,11 +27,11 @@ public class StartNoGui {
 		 */
 
 		//Set the parameters here or directly in the Parameters Class
-		Parameters.maxEvaluations = 5000; // Used to terminate the EA after this many generations
+		Parameters.maxEvaluations = 20000; // Used to terminate the EA after this many generations
 		Parameters.popSize = 200; // Population Size
 
 		//number of hidden nodes in the neural network
-		Parameters.setHidden(5);
+		Parameters.setHidden(15);
 		
 		//Set the data set for training 
 		Parameters.setDataSet(DataSet.Training);
@@ -52,7 +60,8 @@ public class StartNoGui {
 		 */
 		Parameters.setDataSet(DataSet.Test);
 		double fitness = Fitness.evaluate(nn);
-		System.out.println("Fitness on " + Parameters.getDataSet() + " " + fitness);
+		String s = "\r\nFitness on " + Parameters.getDataSet() + " " + fitness;
+		System.out.println(s);
 		
 		/**
 		 * Or We can reload the NN from the file generated during training and test it on a data set 
@@ -63,11 +72,45 @@ public class StartNoGui {
 		 * Files are saved automatically at the end of training
 		 *  
 		 */
-		
-		ExampleEvolutionaryAlgorithm nn2 = ExampleEvolutionaryAlgorithm.loadNeuralNetwork(null);
-		Parameters.setDataSet(DataSet.Random);
-		double fitness2 = Fitness.evaluate(nn2);
-		System.out.println("Fitness on " + Parameters.getDataSet() + " " + fitness2);
+		File file = getLastModified("C:/projects/SET10107 Computational Intelligence Coursework 2022/Computational Intelligence Coursework");
+		PrintWriter out;
+		try {
+			out = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
+		    out.println(s);
+		    out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+//		ExampleEvolutionaryAlgorithm nn2 = ExampleEvolutionaryAlgorithm.loadNeuralNetwork(null);
+//		Parameters.setDataSet(DataSet.Random);
+//		double fitness2 = Fitness.evaluate(nn2);
+//		System.out.println("Fitness on " + Parameters.getDataSet() + " " + fitness2);
 		
 	}
+	
+	public static File getLastModified(String directoryFilePath)
+	{
+	    File directory = new File(directoryFilePath);
+	    File[] files = directory.listFiles(File::isFile);
+	    long lastModifiedTime = Long.MIN_VALUE;
+	    File chosenFile = null;
+
+	    if (files != null)
+	    {
+	        for (File file : files)
+	        {
+	            if (file.lastModified() > lastModifiedTime)
+	            {
+	                chosenFile = file;
+	                lastModifiedTime = file.lastModified();
+	            }
+	        }
+	    }
+
+	    return chosenFile;
+	}
 }
+
+
